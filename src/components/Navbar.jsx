@@ -1,289 +1,195 @@
-import React, { useState } from 'react';
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Button, 
-  Badge, 
-  IconButton, 
-  Box, 
-  Container,
-  useScrollTrigger,
-  Slide,
-  Menu,
-  MenuItem,
-  Divider,
-  Avatar
-} from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LocalBarIcon from '@mui/icons-material/LocalBar';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+"use client"
+import { Link, useLocation } from "react-router-dom"
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Avatar,
+  Box,
+  useMediaQuery,
+  useTheme,
+  InputBase,
+  Badge,
+  Button,
+} from "@mui/material"
+import {
+  Menu as MenuIcon,
+  Search as SearchIcon,
+  Notifications as NotificationsIcon,
+  Mail as MailIcon,
+  Home as HomeIcon,
+  TrendingUp as TrendingUpIcon,
+  People as PeopleIcon,
+} from "@mui/icons-material"
+import { styled, alpha } from "@mui/material/styles"
 
-function HideOnScroll(props) {
-  const { children } = props;
-  const trigger = useScrollTrigger();
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(3),
+    width: "auto",
+  },
+}))
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}))
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("md")]: {
+      width: "20ch",
+    },
+  },
+}))
+
+const NavButton = styled(Button)(({ theme }) => ({
+  color: "white",
+  textTransform: "none",
+  fontWeight: "bold",
+  marginRight: theme.spacing(1),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.1),
+  },
+}))
+
+function Navbar({ handleDrawerToggle }) {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+  const isMedium = useMediaQuery(theme.breakpoints.down("md"))
+  const location = useLocation()
+
+  // Determine which tab is active based on current path
+  const getActiveTab = () => {
+    const path = location.pathname
+    if (path === "/" || path === "/feed") return 0
+    if (path === "/trending-posts") return 1
+    if (path === "/top-users") return 2
+    return 0
+  }
 
   return (
-    <Slide appear={false} direction="down" in={!trigger}>
-      {children}
-    </Slide>
-  );
+    <AppBar
+      position="fixed"
+      sx={{
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+      }}
+    >
+      <Toolbar>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          edge="start"
+          onClick={handleDrawerToggle}
+          sx={{ mr: 2, display: { sm: "none" } }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ display: { xs: "none", sm: "block" }, fontWeight: "bold", mr: 3 }}
+        >
+          SocialFeed
+        </Typography>
+
+        {/* Navigation Links - Hide on mobile, show on tablet and up */}
+        {!isMobile && (
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <NavButton
+              component={Link}
+              to="/"
+              startIcon={<HomeIcon />}
+              variant={getActiveTab() === 0 ? "contained" : "text"}
+              sx={{
+                backgroundColor: getActiveTab() === 0 ? alpha(theme.palette.common.white, 0.15) : "transparent",
+                minWidth: isMedium ? "auto" : 100,
+              }}
+            >
+              {!isMedium && "Feed"}
+            </NavButton>
+
+            <NavButton
+              component={Link}
+              to="/trending-posts"
+              startIcon={<TrendingUpIcon />}
+              variant={getActiveTab() === 1 ? "contained" : "text"}
+              sx={{
+                backgroundColor: getActiveTab() === 1 ? alpha(theme.palette.common.white, 0.15) : "transparent",
+                minWidth: isMedium ? "auto" : 100,
+              }}
+            >
+              {!isMedium && "Trending"}
+            </NavButton>
+
+            <NavButton
+              component={Link}
+              to="/top-users"
+              startIcon={<PeopleIcon />}
+              variant={getActiveTab() === 2 ? "contained" : "text"}
+              sx={{
+                backgroundColor: getActiveTab() === 2 ? alpha(theme.palette.common.white, 0.15) : "transparent",
+                minWidth: isMedium ? "auto" : 100,
+              }}
+            >
+              {!isMedium && "Top Users"}
+            </NavButton>
+          </Box>
+        )}
+
+        <Search sx={{ ml: isMobile ? 0 : 2 }}>
+          <SearchIconWrapper>
+            <SearchIcon />
+          </SearchIconWrapper>
+          <StyledInputBase placeholder="Search…" inputProps={{ "aria-label": "search" }} />
+        </Search>
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        <Box sx={{ display: "flex" }}>
+          <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+            <Badge badgeContent={4} color="error">
+              <MailIcon />
+            </Badge>
+          </IconButton>
+          <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
+            <Badge badgeContent={17} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+          <IconButton size="large" edge="end" aria-label="account of current user" aria-haspopup="true" color="inherit">
+            <Avatar
+              alt="User"
+              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+            />
+          </IconButton>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  )
 }
 
-function Navbar({ cartItemCount = 0 }) {
-  const [accountMenuAnchor, setAccountMenuAnchor] = useState(null);
-  
-  const handleAccountMenuOpen = (event) => {
-    setAccountMenuAnchor(event.currentTarget);
-  };
-  
-  const handleAccountMenuClose = () => {
-    setAccountMenuAnchor(null);
-  };
+export default Navbar
 
-  const navItems = [
-    { label: 'Home', path: '/' },
-    { label: 'Our Menu', path: '/menu' },
-    { label: 'Loyalty Program', path: '/loyalty' },
-    { label: 'About Us', path: '/about' },
-  ];
-
-  return (
-    <HideOnScroll>
-      <AppBar 
-        position="sticky" 
-        elevation={0}
-        sx={{ 
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
-          color: '#1b5e20',
-        }}
-      >
-        <Container maxWidth="lg">
-          <Toolbar sx={{ py: 1 }}>
-            {/* Logo & Brand */}
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                flexGrow: 1, 
-                gap: 1 
-              }}
-            >
-              <LocalBarIcon 
-                sx={{ 
-                  fontSize: 32, 
-                  color: '#2e7d32',
-                  filter: 'drop-shadow(0px 1px 1px rgba(0,0,0,0.2))'
-                }}
-              />
-              <Typography 
-                variant="h5" 
-                component={RouterLink} 
-                to="/"
-                sx={{ 
-                  fontWeight: 700, 
-                  letterSpacing: 0.5,
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  fontSize: { xs: '1.2rem', md: '1.5rem' },
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                PURE
-                <Box 
-                  component="span" 
-                  sx={{ 
-                    color: '#66bb6a', 
-                    fontWeight: 400, 
-                    ml: 0.5 
-                  }}
-                >
-                  JUICE
-                </Box>
-              </Typography>
-            </Box>
-            
-            {/* Navigation Links */}
-            <Box 
-              sx={{ 
-                display: { xs: 'none', md: 'flex' },
-                alignItems: 'center',
-                gap: 0.5
-              }}
-            >
-              {navItems.map((item) => (
-                <Button 
-                  key={item.path}
-                  color="inherit" 
-                  component={RouterLink} 
-                  to={item.path}
-                  sx={{ 
-                    mx: 1, 
-                    py: 1,
-                    fontWeight: 500,
-                    fontSize: '0.9rem',
-                    letterSpacing: 0.5,
-                    position: 'relative',
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      bottom: 8,
-                      left: '50%',
-                      width: 0,
-                      height: 2,
-                      backgroundColor: '#2e7d32',
-                      transition: 'all 0.3s ease',
-                      transform: 'translateX(-50%)',
-                      opacity: 0,
-                      borderRadius: 1
-                    },
-                    '&:hover::after': {
-                      width: '50%',
-                      opacity: 1
-                    }
-                  }}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </Box>
-            
-            {/* Action Buttons */}
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center',
-                gap: { xs: 0.5, sm: 1 }
-              }}
-            >
-              <IconButton 
-                color="inherit" 
-                component={RouterLink} 
-                to="/cart"
-                sx={{ 
-                  backgroundColor: 'rgba(46, 125, 50, 0.08)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(46, 125, 50, 0.15)'
-                  },
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Badge 
-                  badgeContent={cartItemCount} 
-                  color="error"
-                  sx={{
-                    '& .MuiBadge-badge': {
-                      fontWeight: 'bold',
-                      fontSize: '0.7rem'
-                    }
-                  }}
-                >
-                  <ShoppingCartIcon />
-                </Badge>
-              </IconButton>
-              
-              <IconButton 
-                color="inherit"
-                onClick={handleAccountMenuOpen}
-                aria-controls="account-menu"
-                aria-haspopup="true"
-                sx={{ 
-                  backgroundColor: 'rgba(46, 125, 50, 0.08)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(46, 125, 50, 0.15)'
-                  },
-                  transition: 'all 0.2s',
-                  ml: 1
-                }}
-              >
-                <AccountCircleIcon />
-                <KeyboardArrowDownIcon fontSize="small" sx={{ ml: -0.5 }} />
-              </IconButton>
-              
-              <Menu
-                id="account-menu"
-                anchorEl={accountMenuAnchor}
-                open={Boolean(accountMenuAnchor)}
-                onClose={handleAccountMenuClose}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                PaperProps={{
-                  elevation: 2,
-                  sx: {
-                    mt: 1.5,
-                    borderRadius: 2,
-                    minWidth: 180,
-                    overflow: 'visible',
-                    '&:before': {
-                      content: '""',
-                      display: 'block',
-                      position: 'absolute',
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: 'background.paper',
-                      transform: 'translateY(-50%) rotate(45deg)',
-                      zIndex: 0,
-                    },
-                  },
-                }}
-              >
-                <Box sx={{ px: 2, py: 1.5, display: 'flex', alignItems: 'center' }}>
-                  <Avatar 
-                    sx={{ 
-                      width: 32, 
-                      height: 32, 
-                      bgcolor: '#2e7d32',
-                      mr: 1.5,
-                      fontSize: '0.9rem'
-                    }}
-                  >
-                    G
-                  </Avatar>
-                  <Box>
-                    <Typography variant="subtitle2">Guest User</Typography>
-                    <Typography variant="caption" color="text.secondary">guest@example.com</Typography>
-                  </Box>
-                </Box>
-                <Divider />
-                <MenuItem 
-                  component={RouterLink} 
-                  to="/profile"
-                  onClick={handleAccountMenuClose}
-                  sx={{ py: 1.5 }}
-                >
-                  My Profile
-                </MenuItem>
-                <MenuItem 
-                  component={RouterLink} 
-                  to="/orders"
-                  onClick={handleAccountMenuClose}
-                  sx={{ py: 1.5 }}
-                >
-                  Order History
-                </MenuItem>
-                <Divider />
-                <MenuItem 
-                  component={RouterLink} 
-                  to="/logout"
-                  onClick={handleAccountMenuClose}
-                  sx={{ py: 1.5, color: '#d32f2f' }}
-                >
-                  Sign Out
-                </MenuItem>
-              </Menu>
-            </Box>
-          </Toolbar>
-        </Container>
-      </AppBar>
-    </HideOnScroll>
-  );
-}
-
-export default Navbar;

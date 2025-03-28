@@ -1,58 +1,36 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
-import MenuPage from './pages/MenuPage';
-import CartPage from './pages/CartPage';
-import CheckoutPage from './pages/CheckoutPage';
-import OrderTrackingPage from './pages/OrderTrackingPage';
-import LoginPage from './pages/LoginPage';
-import LoyaltyPointsPage from './pages/LoyaltyPointsPage';
-import  AboutUsSection from './pages/About'
-import ProfilePage from './pages/ProfilePage'
-import Chatbot from './components/Chatbot';
-// Simple theme with juice-related colors
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#4caf50', // Green - represents freshness
-    },
-    secondary: {
-      main: '#ff9800', // Orange - represents fruit/juice
-    },
-  },
-});
+import Sidebar from './components/Sidebar'
+import TopUsers from './pages/Topusers';
+import Feed from './pages/Feedpage';
+import TrendingPosts from './pages/Trendingposts';
+
+const theme = createTheme();
 
 function App() {
-  const [cart, setCart] = useState([]);
-  
-  const addToCart = (item) => {
-    setCart([...cart, item]);
-  };
-  
+  React.useEffect(() => {
+    // Initialize auth if needed
+    const token = localStorage.getItem('affordmed_token');
+    if (!token) {
+      console.log('No auth token - need to register');
+      // You can add registration flow here
+    }
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <Navbar cartItemCount={cart.length} />
+      <Router>
+        <Navbar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/menu" element={<MenuPage addToCart={addToCart} />} />
-          <Route path="/cart" element={<CartPage cart={cart} setCart={setCart} />} />
-          <Route path="/checkout" element={<CheckoutPage cart={cart} />} />
-          <Route path="/track" element={<OrderTrackingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/loyalty" element={<LoyaltyPointsPage />} />
-          <Route path="/about" element={<AboutUsSection />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/chat" element={<Chatbot/>} />
-
-
-
+          <Route path="/top-users" element={<TopUsers />} />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/trending-posts" element={<TrendingPosts />} />
+          <Route path="/" element={<Feed />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </ThemeProvider>
   );
 }
